@@ -50,8 +50,9 @@ let vote = function(from,voteFor,processor){
 };
 
 
-describe('init', function() {
-	it('Eevnt join', function() {
+describe('Server Event Processor', function() {
+	
+	it('Server Eevnt join', function() {
 		let middleware = new ServerMiddleware();
 		let processor = new EventProcessor(middleware);
 		
@@ -66,7 +67,7 @@ describe('init', function() {
 		players = Object.keys(middleware.getAllPlayers());
 		assert.equal(5,players.length);
 	});
-	it('Eevnt start', function() {
+	it('Server Eevnt start', function() {
 		let middleware = new ServerMiddleware();
 		let processor = new EventProcessor(middleware);
 		join("1name","1id",processor);
@@ -82,7 +83,7 @@ describe('init', function() {
 		assert.equal(tasks.length,Au.TASK_NUMBER*players.length -
 								  Au.TASK_NUMBER*Au.IMPOSTER_NUMBER);
 	});
-	it('Eevnt clear task', function() {
+	it('Server Eevnt clear task', function() {
 		let middleware = new ServerMiddleware();
 		let processor = new EventProcessor(middleware);
 		join("1name","1id",processor);
@@ -108,7 +109,7 @@ describe('init', function() {
 		//check that the for loop actually ran to completion
 		assert.equal(middleware.internalMessageBuffer.length,1);
 	});
-	it('Eevnt kill', function() {
+	it('Server Eevnt kill', function() {
 		let middleware = new ServerMiddleware();
 		let processor = new EventProcessor(middleware);
 		join("1name","1id",processor);
@@ -144,7 +145,7 @@ describe('init', function() {
 		//check that the for loop actually ran to completion
 		assert.equal(middleware.internalMessageBuffer.length,1);
 	});
-	it('Eevnt meeting', function() {
+	it('Server Eevnt meeting', function() {
 		let middleware = new ServerMiddleware();
 		let processor = new EventProcessor(middleware);
 		join("1name","1id",processor);
@@ -159,12 +160,12 @@ describe('init', function() {
 		//assert that calling a meeting clears any previous votes
 		assert.equal(middleware.model.varVotes.length,0);
 	});
-	it('Eevnt vote', function() {
+	it('Server Eevnt vote', function() {
 		let middleware = new ServerMiddleware();
 		let processor = new EventProcessor(middleware);
 		let resetVote = function(){
 			middleware = new ServerMiddleware();
-			processor = new EventProcessor(middleware)
+			processor = new EventProcessor(middleware);
 			join("1name","1id",processor);
 			join("2name","2id",processor);
 			join("3name","3id",processor);
