@@ -42,7 +42,13 @@ global.$ = function(){
 	};
 };
 //alert stub
-global.alert = function(){};
+global.alert = function(msg){
+	console.log(msg);
+};
+global.confirm = function(msg){
+	console.log(msg);
+	return true;
+};
 //alert stub
 global.document = {
 	getElementById:function(){}
@@ -130,6 +136,79 @@ describe('Client States', function() {
 		assert.equal(true,true);//just assert no error was thrown
 	});
 	
+	
+	//-- state playing has doAction method to test	
+	it('Client state test - doAction (imposter)', function() {
+		setUp();
+		Au.varPlayerId = "1id";
+		Au.state  =Au.states.statePlaying;
+		let messageQueue = [];
+		Au.sendMessage = function(msg){
+			messageQueue.push(JSON.parse(msg));//capture messages for the action
+		};
+		Au.state.doAction(Au.TASKS.KILL,"A");
+		assert.equal(messageQueue.length,1);
+		assert.equal(messageQueue[0].kind,Au.EVENTS.KILL);
+		messageQueue=[];
+		
+		Au.state.doAction(Au.TASKS.SABOTAGE,"A");
+		assert.equal(messageQueue.length,1);
+		assert.equal(messageQueue[0].kind,Au.EVENTS.SABOTAGE);
+		messageQueue=[];
+		
+		Au.state.doAction(Au.TASKS.MEETING);
+		assert.equal(messageQueue.length,1);
+		assert.equal(messageQueue[0].kind,Au.EVENTS.MEETING);
+		messageQueue=[];
+		
+		Au.state.doAction(Au.TASKS.VIEW_LOG);
+		assert.equal(messageQueue.length,0);
+		assert.equal(Au.state, Au.states.stateViewLog);
+		messageQueue=[];
+		
+	});
+	it('Client state test - doAction (innocent)', function() {
+		setUp();
+		Au.varPlayerId = "5id";
+		Au.state  =Au.states.statePlaying;
+		let messageQueue = [];
+		Au.sendMessage = function(msg){
+			messageQueue.push(JSON.parse(msg));//capture messages for the action
+		};
+		
+		//interact 1: no task started for this player, they are alive
+		Au.state.doAction(Au.TASKS.INTERACT,"A");
+		assert.equal(messageQueue.length,0);
+		messageQueue=[];
+		//interact 1: no task started for this player, they are dead
+		let modPlayer = Au.middleware.getPlayerByTag("A");
+		modPlayer.isAlive = false;
+		Au.state.doAction(Au.TASKS.INTERACT,"A");
+		assert.equal(messageQueue.length,1);
+		assert.equal(messageQueue[0].kind,Au.EVENTS.MEETING);
+		messageQueue=[];
+		modPlayer.isAlive = true;
+		
+		
+		let tasks = Au.middleware.getTasksForPlayer(Au.varPlayerId);
+		let firstTask = tasks[Object.keys(tasks)[0]];
+		
+		Au.state.doAction(Au.TASKS.TASK,firstTask.name);
+		assert.equal(Au.state, Au.states.stateTask);
+		Au.state = Au.states.statePlaying;
+		
+		Au.state.doAction(Au.TASKS.MEETING);
+		assert.equal(messageQueue.length,1);
+		assert.equal(messageQueue[0].kind,Au.EVENTS.MEETING);
+		messageQueue=[];
+		
+		Au.state.doAction(Au.TASKS.VIEW_LOG);
+		assert.equal(messageQueue.length,0);
+		assert.equal(Au.state, Au.states.stateViewLog);
+		messageQueue=[];
+		
+		
+	});
 	
 	
 	
