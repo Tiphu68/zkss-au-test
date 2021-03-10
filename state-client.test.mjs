@@ -38,7 +38,8 @@ global.$ = function(){
 		append:function(){},
 		prepend:function(){},
 		length:function(){return 0;},
-		remove:function(){}
+		remove:function(){},
+		val:function(){}
 	};
 };
 //alert stub
